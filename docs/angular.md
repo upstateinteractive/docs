@@ -8,8 +8,9 @@ We use Angular as our front-end framework of choice. It's a full-featured framew
 There is a lot of information out there. Some good. Some bad. But here you'll find our standards on what is right. 
 
 ## Table of Contents
-1. [Installing Angular CLI](#installing-angular-cli)  
-2. [Routing](#routing)
+1. [Installing Angular CLI](#installing-angular-cli)
+2. [Starting A New Project](#starting-a-new-project)  
+3. [Routing](#routing)
 
 ### Installing Angular CLI
 > We use [Angular CLI](https://cli.angular.io) on all of our new projects. The CLI starts the project with sensible defaults and makes it simple to generate new components, modules, etc...  
@@ -25,6 +26,38 @@ npm install -g @angular/cli
 _Set Yarn as default package manager_
 ```bash
 ng set --global packageManager=yarn  
+```
+
+### Starting A New Project
+
+```bash 
+ng new PROJECT-NAME
+cd PROJECT-NAME
+ng serve
+```
+
+#### Generating Common Files
+```bash 
+ng g component my-new-component
+ng g service my-new-service
+ng g module my-new-module
+```
+
+#### Adding Bootstrap
+```bash
+npm install bootstrap@4.0.0-alpha.6
+```
+> In your `angular-cli.json` file, add the following paths:
+
+```bash
+"styles": [
+    "styles.css",
+    "../node_modules/bootstrap/dist/css/bootstrap.min.css"
+  ],
+  "scripts": [
+    "../node_modules/jquery/dist/jquery.min.js",
+    "../node_modules/bootstrap/dist/js/bootstrap.min.js"
+  ],
 ```
 
 ### Routing
