@@ -124,7 +124,7 @@ Run `npm start` to serve your optimized code and visit the network tab of your b
 8. [Use your store selection, in this case `searching$` on your component](https://github.com/ngrx/platform/blob/master/example-app/app/books/containers/find-book-page.ts#L14)  
 9. [Use the value to toggle visibility of your loading indicator](https://github.com/ngrx/platform/blob/master/example-app/app/books/components/book-search.ts#L15)  
 
-This general idea can be applied anywhere in CampusPro, replacing SEARCH with the action of the request (POST, GET, you get the point).   
+This general idea can be applied anywhere, replacing SEARCH with the action of the request (POST, GET, you get the point).   
   
 It might be that you'll make subtle modifications to the above, but with these instructions you can make those decisions where necessary.  
 
