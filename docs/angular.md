@@ -12,6 +12,7 @@ There is a lot of information out there. Some good. Some bad. But here you'll fi
 2. [Starting A New Project](#starting-a-new-project)  
 3. [Routing](#routing)
 4. [Webpack Bundle Analyzer](#webpack-bundle-analyzer)
+5. [Using ngRx with a loading indicator](#using-ngrx-with-a-loading-indicator)
 
 ### Installing Angular CLI
 > We use [Angular CLI](https://cli.angular.io) on all of our new projects. The CLI starts the project with sensible defaults and makes it simple to generate new components, modules, etc...  
@@ -109,3 +110,24 @@ npm i -D webpack-bundle-analyzer serve
 Run `npm run bundle-report` to generate a bundle report.
 
 Run `npm start` to serve your optimized code and visit the network tab of your browser to determine the file size.
+
+### Using ngRx with a loading indicator
+@zoitsa using ngrx with a loading indicator requires the following, by example from the [official example app search reducer](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts): 
+
+1. [Add `loading` to your state](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L5)  
+2. [Initialize to `false`](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L12)  
+3. [In your SEARCH action, return state where `loading` is toggled to `true`](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L31-L37)  
+4. [In your SEARCH_COMPLETE action return state where `loading` is toggled back to `false`](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L42)  
+5. [Create a `getLoading function`](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L66)  
+6. **Switch** to your `reducers/index.ts` file. [Create a selector for getLoading](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/index.ts#L104-L107)  
+7. In your component, [select `getLoading` from the store](https://github.com/ngrx/platform/blob/master/example-app/app/books/containers/find-book-page.ts#L27)  
+8. [Use your store selection, in this case `searching$` on your component](https://github.com/ngrx/platform/blob/master/example-app/app/books/containers/find-book-page.ts#L14)  
+9. [Use the value to toggle visibility of your loading indicator](https://github.com/ngrx/platform/blob/master/example-app/app/books/components/book-search.ts#L15)  
+
+This general idea can be applied anywhere in CampusPro, replacing SEARCH with the action of the request (POST, GET, you get the point).   
+  
+It might be that you'll make subtle modifications to the above, but with these instructions you can make those decisions where necessary.  
+
+Loading indicators are everywhere. So you can use this pattern across applications.  You can use it in native applications, web applications, and anywhere there is a screen and Angular. Not only can this pattern be used for loading indicators, you can use it for toggling the display of errors as well. 
+  
+Have fun! And make your loading indicator spin!
