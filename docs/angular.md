@@ -112,7 +112,7 @@ Run `npm run bundle-report` to generate a bundle report.
 Run `npm start` to serve your optimized code and visit the network tab of your browser to determine the file size.
 
 ### Using ngRx with a loading indicator
-@zoitsa using ngrx with a loading indicator requires the following, by example from the [official example app search reducer](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts): 
+Using ngrx with a loading indicator requires the following, by example from the [official example app search reducer](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts): 
 
 1. [Add `loading` to your state](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L5)  
 2. [Initialize to `false`](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L12)  
