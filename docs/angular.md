@@ -25,15 +25,10 @@ _Install Angular CLI_
 npm install -g @angular/cli
 ```
 
-_Set Yarn as default package manager_
-```bash
-ng set --global packageManager=yarn  
-```
-
 ### Starting A New Project
 
 ```bash 
-ng new PROJECT-NAME
+ng new PROJECT-NAME --service-worker true --routing true --spec false --prefix COMPONENT-PREFIX
 cd PROJECT-NAME
 ng serve
 ```
@@ -43,6 +38,16 @@ ng serve
 ng g component my-new-component
 ng g service my-new-service
 ng g module my-new-module
+```
+
+#### Common Installs
+ngrx
+```bash
+npm i -S @ngrx/store @ngrx/store-devtools @ngrx/entity @ngrx/effects
+```
+angular
+```
+npm i -S @angular-devkit/core @angular/material @angular/cdk
 ```
 
 #### Adding Bootstrap
