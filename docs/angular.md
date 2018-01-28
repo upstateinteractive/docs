@@ -44,6 +44,7 @@ ng g module my-new-module
 ngrx
 ```bash
 npm i -S @ngrx/store @ngrx/store-devtools @ngrx/entity @ngrx/effects
+npm i -D @ngrx/schematics
 ```
 angular
 ```
