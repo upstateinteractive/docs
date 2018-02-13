@@ -10,11 +10,14 @@ There is a lot of information out there. Some good. Some bad. But here you'll fi
 ## Table of Contents
 1. [Installing Angular CLI](#installing-angular-cli)
 2. [Starting A New Project](#starting-a-new-project)  
-3. [Routing](#routing)
-4. [Webpack Bundle Analyzer](#webpack-bundle-analyzer)
-5. [Using ngRx with a loading indicator](#using-ngrx-with-a-loading-indicator)
+3. [Starting A New Universal Project](#starting-a-new-universal-project)
+4. [Add TransferState](#add-transferstate)
+5. [Routing](#routing)
+6. [Webpack Bundle Analyzer](#webpack-bundle-analyzer)
+7. [Using ngRx with a loading indicator](#using-ngrx-with-a-loading-indicator)
 
 ### Installing Angular CLI
+------
 > We use [Angular CLI](https://cli.angular.io) on all of our new projects. The CLI starts the project with sensible defaults and makes it simple to generate new components, modules, etc...  
   
 
@@ -25,8 +28,9 @@ _Install Angular CLI_
 npm install -g @angular/cli
 ```
 
-### Starting A New Project
 
+### Starting A New Project
+------
 ```bash 
 ng new PROJECT-NAME --service-worker true --routing true --spec false --prefix COMPONENT-PREFIX
 cd PROJECT-NAME
@@ -68,7 +72,145 @@ npm install bootstrap@4.0.0-alpha.6
   ],
 ```
 
+### Starting A New Universal Project
+------
+```bash 
+ng new PROJECT-NAME --service-worker true --routing true --spec false --prefix COMPONENT-PREFIX
+
+cd PROJECT-NAME
+
+npm install --save @angular/platform-server @nguniversal/module-map-ngfactory-loader ts-loader express
+
+ng generate universal PROJECT-NAME
+```
+
+#### Creating Node Server
+Create a `server.ts` file in the root directory of the project and add the following code.
+```ts
+// These are important and needed before anything else
+import 'zone.js/dist/zone-node';
+import 'reflect-metadata';
+
+import { renderModuleFactory } from '@angular/platform-server';
+import { enableProdMode } from '@angular/core';
+
+import * as express from 'express';
+import { join } from 'path';
+import { readFileSync } from 'fs';
+
+// Faster server renders w/ Prod mode (dev mode never needed)
+enableProdMode();
+
+// Express server
+const app = express();
+
+const PORT = process.env.PORT || 4201;
+const DIST_FOLDER = join(process.cwd(), 'dist');
+
+// Our index.html we'll use as our template
+const template = readFileSync(join(DIST_FOLDER, 'index.html')).toString();
+
+// * NOTE :: leave this as require() since this file is built Dynamically from webpack
+const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require('./dist-server/main.bundle');
+
+const { provideModuleMap } = require('@nguniversal/module-map-ngfactory-loader');
+
+app.engine('html', (_, options, callback) => {
+  renderModuleFactory(AppServerModuleNgFactory, {
+    // Our index.html
+    document: template,
+    url: options.req.url,
+    // DI so that we can get lazy-loading to work differently (since we need it to just instantly render it)
+    extraProviders: [
+      provideModuleMap(LAZY_MODULE_MAP)
+    ]
+  }).then(html => {
+    callback(null, html);
+  });
+});
+
+app.set('view engine', 'html');
+app.set('views', DIST_FOLDER);
+
+// Server static files from dist folder
+app.get('*.*', express.static(DIST_FOLDER));
+
+// All regular routes use the Universal engine
+app.get('*', (req, res) => {
+  res.render('index', { req });
+});
+
+// Start up the Node server
+app.listen(PORT, () => {
+  console.log(`Node server listening on http://localhost:${PORT}`);
+});
+```
+
+#### Creating webpack configuration
+Create a `webpack.server.config.js` file in the root directory of the project and add the following code:
+
+```ts
+const path = require('path');
+const webpack = require('webpack');
+ 
+module.exports = {
+    entry: { server: './server.ts' },
+    resolve: { extensions: ['.ts', '.js'] },
+    target: 'node',
+    // this makes sure we include node_modules and other 3rd party libraries
+    externals: [/(node_modules|main\..*\.js)/],
+    output: {
+        path: path.join(__dirname, 'dist'),
+        filename: '[name].js'
+    },
+    module: {
+        rules: [
+            { test: /\.ts$/, loader: 'ts-loader' }
+        ]
+    },
+    plugins: [
+        // Temporary Fix for issue: https://github.com/angular/angular/issues/11580
+        // for "WARNING Critical dependency: the request of a dependency is an expression"
+        new webpack.ContextReplacementPlugin(
+            /(.+)?angular(\\|\/)core(.+)?/,
+            path.join(__dirname, 'src'), // location of your src
+            {} // a map of your routes
+        ),
+        new webpack.ContextReplacementPlugin(
+            /(.+)?express(\\|\/)(.+)?/,
+            path.join(__dirname, 'src')
+        )
+    ]
+};
+```
+
+#### Update package.json
+```bash
+"build-dev:ssr": "npm run dev:client-and-server-bundles && npm run webpack:server",
+"dev:client-and-server-bundles": "ng build && ng build --prod --app 1 --output-hashing=false"
+"build:ssr": "npm run build:client-and-server-bundles && npm run webpack:server",
+"serve:ssr": "node dist/server.js",
+"build:client-and-server-bundles": "ng build --prod && ng build --prod --app 1 --output-hashing=false",
+"webpack:server": "webpack --config webpack.server.config.js --progress --colors"
+```
+
+#### Usage
+To build in dev mode:
+Run `npm run build-dev:ssr` to bundle your front-end assets 
+Run `npm run serve:ssr` to serve your application on `localhost:4201`
+
+To build in production mode:
+Run `npm run build:ssr` to bundle your front-end assets 
+Run `npm run serve:ssr` to serve your application on `localhost:4201`
+
+
+### Add TransferState
+------
+Coming Soon
+
+
 ### Routing
+------
 > ```ng new project-name --routing```   
 > The `--routing` flag will automatically add a new routing module to your project. Isn't that nice?
 
@@ -93,7 +235,9 @@ const appRoutes: Routes = [
 ];
 ```
 
+
 ### Webpack Bundle Analyzer
+------
 > For when you want to keep your bundle small.
 
 
@@ -118,6 +262,7 @@ Run `npm run bundle-report` to generate a bundle report.
 Run `npm start` to serve your optimized code and visit the network tab of your browser to determine the file size.
 
 ### Using ngRx with a loading indicator
+------
 Using ngrx with a loading indicator requires the following, by example from the [official example app search reducer](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts): 
 
 1. [Add `loading` to your state](https://github.com/ngrx/platform/blob/master/example-app/app/books/reducers/search.ts#L5)  
