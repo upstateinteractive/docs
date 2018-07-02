@@ -27,8 +27,8 @@ Working branches have the form `<type>/<feature>` where `type` is one of:
 - feat
 - fix
 - hotfix
-- update
 - chore
+- docs
 - refactor  
 
 ## Commit Messages
