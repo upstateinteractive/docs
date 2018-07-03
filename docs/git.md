@@ -31,6 +31,12 @@ Working branches have the form `<type>/<feature>` where `type` is one of:
 - docs
 - refactor  
 
+**In Process Branches**  
+Have a branch that's not complete, but want to share it? Use `<type>/<feature>` where `type` is one of:  
+  
+- discuss  
+- temp  
+
 ## Commit Messages
 ### Basic
 `<type>(<scope>):<subject>`  
