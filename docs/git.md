@@ -106,3 +106,5 @@ git push origin <branch-name> -f
 ```
 
 At that point close your existing pull request and open a new one. 
+
+[Link to detailed explanation of rebasing a pull request](https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request)
