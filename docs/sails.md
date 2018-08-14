@@ -43,14 +43,14 @@ This will create two files: a model and contoller
 sails generate helper makeFoo
 ```
 
-####General
+#### General
 - Helpers replace services and add more structure to the code
 - This involves typechecking for values, description settings for function clarification/comments, and a defaultTo value that provides as a fail safe
 - Helpers will only work if the coder is proactive in documentation. Because of the need to define every value that enters and exits the function, a poorly thought out helper will result to confusing legacy code and a weakened logging system
 -It would be useful to know about [how async functions work](https://www.youtube.com/watch?v=568g8hxJJp4&t=98s)
 
 
-####Anatomy of a Helper
+#### Anatomy of a Helper
 A helper starts out with a `module.exports` wrapper that includs a  `friendlyName: ` and `description: ` field. For sake of organization, please name friendlyName as the file name itself. Try a verb and a Noun to clarify what the purpose of the code is. Examples include `friendlyName: fetchArticles` or `friendlyName: queryItunesAPI`. The  `description` field allows for further commmenting.
 
 1. `inputs:` An object that clarifies what function arguments are needed.
@@ -110,7 +110,7 @@ A helper starts out with a `module.exports` wrapper that includs a  `friendlyNam
   }
 ```
 
-####Calling the Helper function
+#### Calling the Helper function
 1. Passing no arguments: `sails.helpers.exampleHelper` would rely on default settings
 2. Passing multiple arguments: `sails.helpers.exampleHelper(1, 'productSerial')` would separate arguments with comma
 3. Chaining: using a 'with' keyword, pass in an object that identifies the value and argument; This is the best practice because it translates to clearer code. Chaining also involves error handling. This includes adding a `.intercept()` or `.tolerate()`. Because of the well defined exit errors, you can then further tailor actions to it.
