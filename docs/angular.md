@@ -75,7 +75,7 @@ npm install bootstrap@4.0.0-alpha.6
 ### Starting A New Universal Project
 ------
 ```bash 
-ng new PROJECT-NAME --service-worker true --routing true --spec false --prefix COMPONENT-PREFIX
+ng new PROJECT-NAME --service-worker true --routing true --skipTests true --prefix COMPONENT-PREFIX
 
 cd PROJECT-NAME
 

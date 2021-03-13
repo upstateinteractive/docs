@@ -1,89 +1,148 @@
-# And ngRx was Good.
+# And Sails was Good.
 
 ## Intro
-ngRx is the prescription for data in Angular.
+Sails is Ruby On Rails for JavaScript.  
   
-We use ngRx as our front-end framework data management library of choice. 
+We use Sails as our rapid API prototyping framework of choice.  
+  
+In here we have our thoughts, opinions, and findings for Sails.  
 
 ## Table of Contents
-1. [Making chained API Calls using @ngrx/Effects](#making-chained-api-calls-using-ngrx-effects)
+1. [Sails Setup](#setup)
+2. [Generate an API](#generate-an-api)
+3. [Helpers](#helpers)
+4. [Limitations](#limitations)  
 
-### Making chained API Calls using @ngrx/Effects
-#### Purpose
-This recipe is useful for cooking up chained API calls as a result of a single action. 
+### Setup
+#### Install Sails
+If you've never used Sails, you first need to install it
+```bash
+npm install sails -g
+``` 
 
-#### Description
-In the below example, a single action called `POST_REPO` is dispatched and it's intention is to create a new repostiory on GitHub then update the README with new data after it is created.  
-For this to happen there are 4 API calls necessary to the GitHub API:  
-1. POST a new repostiry
-2. GET the master branch of the new repository
-3. GET the files on the master branch 
-4. PUT the `README.md` file
-  
-The `POST_REPO`'s payload contains `payload.repo` with information needed for API call 1.  
-The response from API call 1 is necessary for API call 2.  
-The response from API call 2 is necessary for API call 3.  
-The response from API call 3 and `payload.file`, which has information needed to update the README.md file, is neccessary for API call 4.  
-  
-Using `Observable.ForkJoin` makes this possible.  
-  
-#### Example
-```ts
-import { Injectable } from '@angular/core';
-import { Effect, Actions } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { Scheduler } from 'rxjs/Scheduler';
-import { of } from 'rxjs/observable/of';
-import { handleError } from './handleError';
+#### Create Your App
+`cd` into your directory to generate a new app
+```bash
+sails new test-project
+```  
+
+View the app
+```bash
+cd test-project
+sails lift
+```
+
+### Generate an API
+```bash
+sails generate api your-api
+``` 
+This will create two files: a model and contoller
+
+### Helpers
+```bash
+sails generate helper makeFoo
+```
+
+#### General
+- Helpers replace services and add more structure to the code
+- This involves typechecking for values, description settings for function clarification/comments, and a defaultTo value that provides as a fail safe
+- Helpers will only work if the coder is proactive in documentation. Because of the need to define every value that enters and exits the function, a poorly thought out helper will result to confusing legacy code and a weakened logging system
+- It would be useful to know about [how async functions work](https://www.youtube.com/watch?v=568g8hxJJp4&t=98s)
 
 
-import { GithubService } from '../services/github.service';
-import * as githubActions from '../actions/github';
+#### Anatomy of a Helper
+A helper starts out with a `module.exports` wrapper that includes a  `friendlyName: ` and `description: ` field. For sake of organization, please name friendlyName as the file name itself. Try a verb and a noun to clarify what the purpose of the code is. Examples include `friendlyName: fetchArticles` or `friendlyName: queryItunesAPI`. The `description` field allows for further commmenting.
 
-@Injectable()
-export class GitHubEffects {
-  @Effect()
-  postRepo$: Observable<Action> = this.actions$
-    .ofType(githubActions.POST_REPO)
-    .map((action: githubActions.PostRepo) => action.payload)
-    // return the payload and POST the repo
-    .switchMap((payload: any) => Observable.forkJoin([
-      Observable.of(payload),
-      this.githubService.postRepo(payload.repo)
-    ]))
-    // return the repo and the master branch as an array
-    .switchMap((data: any) => {
-      const [payload, repo] = data;
-      return Observable.forkJoin([
-        Observable.of(payload),
-        Observable.of(repo),
-        this.githubService.getMasterBranch(repo.name)
-      ]);
+1. `inputs:` An object that clarifies what function arguments are needed.
+  ```
+  module.exports = {
+    inputs : {
+      userId: {
+        friendlyName: 'user Id from user model',
+        description: 'used to identify user',
+        type: 'number'
+      },
+      productSerialNum: {
+        friendlyName: 'wine cooler serial number',
+        description: 'identify user product item',
+        type: 'string',
+        defaultsTo: 'SE934304'
+      }
+    }
+  }
+  ```
+ This includes fields such as:
+  - `friendlyName:` a friendly name
+  - `description`: what does this function do
+  - `extendedDescription`: any additional details that are not necessary but helpful. Any gotchas?
+  - `type`: this field is particularly useful! While sails does not provide a list of types, examples include number and string. This field helps whoever using the helper function identify arguments entering and exiting function
+  - `defaultsTo`: another useful field to help automate some of the work. Example: If helper function user does not provide the amount of articles needed, automatically defaultTo ten articles
+2. `Exits:` An object that clarifies what exits the function. General defining a successful exit with `success` would suffice and should be the practice for all helper functions. The interesting part is the branching of errors. A good way to track errors would lead to less debugging headaches in the future! Example:
+  ```
+  exits: {
+    success : {
+      outputFriendlyName: 'Product information',
+      outputDescription: 'Information including distribution, availability, created year',
+      type: 'object'
+    },
+
+    missingInput : {
+      outputFriendlyName: 'missing argument',
+      outputDescription: 'Must provide user Id and product serial number'
+    },
+
+    retrievalError : {
+      outputFriendlyName: 'database error',
+      outputDescription: 'Error querying model User or Product'
+    }
+  }
+  ```
+
+3. `fn`: The meat of the helper function, this is replaced with the async await syntax. The function definition requires two arguments: `inputs` and `exits`. Inputs/exits are what are defined earlier. In order to access input property, simply follow `inputs.foo`. The same goes with `exits.success(result)`
+```
+  async function doEverything(input, exits) {
+    //async func A
+    //async func B
+    //async func C
+    if(//something failed!) {
+      throw 'retrievalError'
+    }
+    return exits.success()
+  }
+```
+
+#### Calling the Helper function
+1. Passing no arguments: `sails.helpers.exampleHelper` would rely on default settings.
+2. Passing multiple arguments: `sails.helpers.exampleHelper(1, 'productSerial')` would separate arguments with comma.
+3. Chaining: using a 'with' keyword, pass in an object that identifies the value and argument; This is the best practice because it translates to clearer code. Chaining also involves error handling. This includes adding a `.intercept()` or `.tolerate()`. Because of the well defined exit errors, you can then further tailor actions to it.
+  ```
+    sails.helpers.example-helper.with({
+      userId: 1,
+      productSerial: 'SE29282'
+    }).intercept('missingInput', () => {
+      sails.log('Missing input field! Please ensure all inputs are entered or include defaultTo value')
     })
-    // return the payload, the repo, and get the sha for README
-    .switchMap((data: any) => {
-      const [payload, repo, branch] = data;
-      return Observable.forkJoin([
-        Observable.of(payload),
-        Observable.of(repo),
-        this.githubService.getFiles(repo.name, branch)
-          .map((files: any) => files.tree
-            .filter(file => file.path === 'README.md')
-            .map(file => file.sha)[0]
-          )
-      ]);
-    })
-    // update README with data from payload.file
-    .switchMap((data: any) => {
-      const [payload, repo, sha] = data;
-      payload.file.sha = sha;
-      return this.githubService.putFile(repo.name, payload.file);
-    });
+  ```
 
-  constructor(
-    private actions$: Actions,
-    private githubService: GithubService,
-  ) {}
+### Configure Settings
+#### Database
+Go to the `config/connections.js` to set database connection. 
+To use default local database:
+```bash
+localDiskDb: {
+  adapter: 'sails-disk'
 }
 ```
+
+#### Models
+Go to the `config/models.js` file to set model configurations. 
+```bash
+module.exports.models = {
+  connection: 'localDiskDb',
+  migrate: 'alter'
+};
+``` 
+
+### Limitations
+#### No Foreign Key Contraints 
+Waterline - the default ORM that ships with Sails - does not build Foreign Key Constraints on tables when you're writing one-to-many relationships. Our untested but promising solution would be to, when the time is right, use [sails-hook-sequelize](https://www.npmjs.com/package/sails-hook-sequelize) to swap out Waterline for Sequelize.
