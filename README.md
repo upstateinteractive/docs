@@ -21,20 +21,20 @@ __Frontend:__
 * [RxJs](docs/rxjs.md) for reactive programming
 
 __Backend:__
-* _Nodejs_
-* _Expressjs_
-* [_Sails.js_](docs/sails.md) 
-* [_Data Models_](docs/data-models.md)
+* Nodejs
+* Expressjs
+* [Sails.js](docs/sails.md) 
+* [Data Models](docs/data-models.md)
 
 __Blockchain:__
-* [_Home_](docs/blockchain/home.md)
-* [_Resources_](docs/blockchain/resources.md)
+* [Home](docs/blockchain/home.md)
+* [Resources](docs/blockchain/resources.md)
 
 
 __Mobile:__
-* [_NativeScript_](docs/mobile/nativescript.md)
-* [_Apple Developer Account_](docs/mobile/apple-account.md)
-* [_Distributing iOS App_](docs/mobile/distribution.md)
+* [NativeScript](docs/mobile/nativescript.md)
+* [Apple Developer Account](docs/mobile/apple-account.md)
+* [Distributing iOS App](docs/mobile/distribution.md)
   
 __Others:__
-* [_ESLint_](docs/eslint.md)  
+* [ESLint](docs/eslint.md)  
