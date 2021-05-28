@@ -6,7 +6,7 @@
 The purpose of this training program is to provide developers with the skills to design, code, deploy and execute smart contracts. The program is comprised of mini-projects that target education around important protocols and features in the current smart contract development landscape. Projects will be treated as client projects and follow the agile scrum methodology with sprint planning meetings, daily standups, and sprint retrospectives. The goal of each project will be to complete a working prototype that is deployed to mainnet. 
 
 ## The Projects
-* [L2 PAYME](projects/payme.md)
+* [CashCoin](projects/cashcoin.md)
 * [KARATE CHOP LIQUIDITY SWAP](projects/karate-chop.md)
 * NFT: coming soon
 * Staking: coming soon

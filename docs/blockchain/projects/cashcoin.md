@@ -1,4 +1,4 @@
-# L2 PAYME DAPP
+# CashCoin DAPP
 The following requirements are associated with building a decentralized payment application on a Layer 2 platform.
 
 ## What is Layer 2?
@@ -16,12 +16,14 @@ Your solution should address the following user stories:
 #### User - Payment - I can request payment from an address
 *Scenario*
 - A user wants to request payment from an address
+
 *Acceptance Criteria*
 - Maps payment amount to requester and requestee
 
 #### User - Payment - I can make a payment
 *Scenario*
 - A user wants make a payment
+
 *Acceptance Criteria*
 - Must transfer payment
 - Decreases amount due for user
