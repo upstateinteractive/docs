@@ -4,3 +4,4 @@ We are primarily focused on developing distributed applications and smart contra
 
 * [Smart Contract Training Program](training.md)
 * [Resources](resources.md)
+* [Technical Resources](technical-resources.md)
