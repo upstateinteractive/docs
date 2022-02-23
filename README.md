@@ -1,4 +1,4 @@
-![logo](/files/sm-grad-logo.png)
+![cover](/files/Cover.png)
 # Docs 
 
 ## Process makes perfect.  
@@ -38,3 +38,7 @@ __Mobile:__
   
 __Others:__
 * [ESLint](docs/eslint.md)  
+
+
+## Design Guides
+* [Brand Assets](docs/design/brand.md)
