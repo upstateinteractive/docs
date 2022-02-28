@@ -157,6 +157,27 @@ React is also used in a number of other popular front-end frameworks such as [Ne
 
 ## Your First Component
 
+A React __component__ is (most commonly) a function that returns __JSX__ or `null`.
+
+Within your newly created application, open `src/App.js` and replace the content with the following:
+
+```jsx
+// src/App.js
+function App() {
+  return (
+    <h1>Hello World!</h1>
+  )
+}
+
+export default App;
+```
+
+Start your application by running either `npm start` or `yarn start` in the same folder as your `package.json`.
+
+Within the newly opened browser window (at `http://localhost:3000`), you should see a heading with "Hello World!" on the page. Your React app will render to the page via the div with an id of `#root`.
+## Props
+
+
 ## Hooks
 
 ### useState
