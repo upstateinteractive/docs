@@ -7,6 +7,7 @@ We use documented processes whenever possible. They make getting up to speed eas
 
 ## Engineering Best Practices
 * [Git](docs/git.md)
+* [GitHub](docs/github.md)
 * [Code Reviews and Pull Requests](docs/pull-requests.md)
 
 ## Process 
@@ -29,7 +30,6 @@ __Backend:__
 __Blockchain:__
 * [Home](docs/blockchain/home.md)
 * [Resources](docs/blockchain/resources.md)
-
 
 __Mobile:__
 * [NativeScript](docs/mobile/nativescript.md)
