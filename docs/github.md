@@ -6,7 +6,7 @@
 
 GitHub provides the ability to generate pull request and issue ticket templates to encourage consensus of code style, purpose of changes and structuring issues. 
 
-This folder provides examples of a pull request template, a bug issue ticket template, and a feature issue ticket template.
+The enclosed `github` folder provides examples of a [pull request template](./github/PULL_REQUEST_TEMPLATE.md), a [bug issue ticket template](./github/ISSUE_TEMPLATE/BUG.md), and a [feature issue ticket template](./github/ISSUE_TEMPLATE/FEATURE.md).
 
 This can be done for a particular folder, by adding a `.github` folder adjacent to the git directory, or organization-wide, by implementing a `.github` repo.
 
