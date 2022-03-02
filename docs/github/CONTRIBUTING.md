@@ -27,12 +27,12 @@ The production branch for this repository is `main`, and `development` is for st
 
 ## Making Pull Requests
 
-All pull requests apart from deployment should be made from the feature branch to `main`.
+All pull requests apart from deployment should be made from the feature branch to `origin/main`.
 
-Before making a pull request, please make sure to rebase your branch with `main` to ensure all previous features are included.
+Before making a pull request, please make sure to fetch and rebase your branch with `origin/main` to ensure all previous features are included.
 
 ```sh
-git rebase main
+git rebase origin/main
 ```
 
 Once your pull request has been made, make sure to fill out the checklist before merging.
