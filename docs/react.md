@@ -21,7 +21,6 @@ This guide is intended to introduce you to [React](https://github.com/facebook/r
   - [useState](#usestate)
     - [with TypeScript](#usestate-with-typescript)
   - [useEffect](#useeffect)
-    - [with TypeScript](#useeffect-with-typescript)
   - [useReducer](#usereducer)
     - [with TypeScript](#usereducer-with-typescript)
   - [useContext](#usecontext)
@@ -55,11 +54,8 @@ primaryButton.onclick = () => console.log("Primary!");
 Now the same code expressed with JSX:
 
 ```html
-<button
-  className="primary"
-  id="primary-click"
-  onClick={() => console.log("Primary!")}
-/>
+<button className="primary" id="primary-click" onClick={() =>
+console.log("Primary!")} />
 ```
 
 JSX uses camelCase on all attributes, and curly braces for all non-string attribute values (numbers, booleans, functions).
@@ -302,6 +298,84 @@ export default Post;
 
 Now one of our `Post` components is displaying text, and the other does not. Try passing the second `Post` some example `author`, `body`, and `title` props.
 
+### Other Reserved Words in Props and Attributes
+
+Similar to `key`, there are other reserved words that have either have specific functions as props or JSX attributes.
+
+#### ref
+
+`ref` is used by React to target for events within components, and is not passed down as a prop to the child component.
+
+#### style
+
+In vanilla HTML, it's possible to pass a string of CSS style properties to an element to style it inline. In React, instead of passing a string, you can pass an object of CSS style properties in camelCase:
+
+```jsx
+// src/Post.jsx
+const Post = (props) => {
+  a;
+  const postStyles = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  };
+
+  return (
+    <article style={postStyles} className="post">
+      <h3>{props.title}</h3>
+      <h4>{props.author}</h4>
+      <p>{props.body}</p>
+    </article>
+  );
+};
+
+export default Post;
+```
+
+#### className
+
+When working with JSX elements, the `class` keyword is reserved, so all instances should be replaced with `className`:
+
+```jsx
+// src/Post.jsx
+const Post = (props) => {
+  return (
+    <article className="post">
+      <h3>{props.title}</h3>
+      <h4>{props.author}</h4>
+      <p>{props.body}</p>
+    </article>
+  );
+};
+
+export default Post;
+```
+
+#### children
+
+Components can be rendered as self-closing tags or open and closing tags. If rendered with opening and closing tags, the `children` prop can be used to render any elements or components within the two tags:
+
+```jsx
+const Container = (props) => {
+  return <main>{props.children}</main>;
+};
+
+const Page = () => {
+  return (
+    <Container>
+      <h1>Welcome to Our Page!</h1>
+      <article>
+        <h3>How To Make a React Component</h3>
+        <p>You got this!</p>
+      </article>
+    </Container>
+  );
+};
+
+export default Page;
+```
+
 ### Leveraging Arrays
 
 Unless you have a fixed number of items to render, it can often be more practical to use an array of an objects and the `.map` function to render components. Let's take our existing example and change it to use `.map`, as well as a single prop for all of the post's information:
@@ -314,21 +388,21 @@ function App() {
   const name = "your name here";
   // this array could also be imported in
   const blogPosts = [
-    { 
+    {
       author: name,
       body: "Writing blog posts is really fun!",
-      title: "My First Blog Post"
+      title: "My First Blog Post",
     },
-    { 
+    {
       author: "Some Other Author",
       body: "Here is a second post to provide an example.",
-      title: "My Second Blog Post"
-    }
-  ]
+      title: "My Second Blog Post",
+    },
+  ];
   return (
     <main>
       <h1>Hello World, I'm {name}!</h1>
-      {posts.map((post, index) => (
+      {blogPosts.map((post, index) => (
         <Post key={index} post={post} />
       ))}
     </main>
@@ -342,7 +416,7 @@ export default App;
 // src/Post.jsx
 const Post = (props) => {
   return (
-    <article>
+    <article className="post">
       <h3>{props.post.title}</h3>
       <h4>{props.post.author}</h4>
       <p>{props.post.body}</p>
@@ -363,10 +437,10 @@ This brings up the following questions:
 4. How can we share information between components outside of props?
 5. How can we run side effects after or between re-renders?
 
-For most, if not all of these questions, the answer lies in different React **hooks**.
+For most, if not all of these questions, the answer lies in different React **hooks**:
 
 1. a component re-renders whenever its `props` or **state** change. **State** in a React application is a unique type of variable that preserves data between re-renders. It can be created using the `useState` and `useReducer` hooks.
-2. to change data and have it persist, you can update a component's state. All child components using that state will be re-rendered to show the new information.
+2. to change data and have it persist, you can update a component's state. All child components using that state (via props or context) will be re-rendered to show the new information.
 3. both `useMemo` and `useCallback` serve to avoid re-computing values or functions respectively.
 4. to share information without props, you can implement `useContext` to selectively bring in any information stored within that particular context.
 5. to run side effects depending on state/props updates, you can add a `useEffect` that runs whenever stateful variables or props change.
@@ -375,13 +449,177 @@ Let's go ahead and try implementing these hooks!
 
 ## Hooks
 
+This section introduces a series of hooks provided by React that provide essential storage and lifecycle functionality. When working in React, most information is redeclared upon each render—the general exception to this rule are imports and React hooks. Hooks should not be called conditionally, in the same order, and before any other functions declared in the component. Let's see how they can be used to make changes to persistent data.
+
 ### useState
+
+The `useState` hook can be used to create persistent, mutable data. Declaring a `useState` yields a state getter, and a state setter.
+
+```js
+const [getter, setter] = useState(initialValue);
+```
+
+```jsx
+import { useState } from "react";
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <span>This is the current count: {count}</span>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </div>
+  );
+};
+
+export default Counter;
+```
+
+Let's return to our example from before and apply state with the `useState` hook.
+
+```jsx
+// src/Post.jsx
+import { useState } from "react";
+
+const Post = (props) => {
+  const [like, setLike] = useState(false);
+
+  return (
+    <article className="post">
+      <h3>{props.post.title}</h3>
+      <h4>{props.post.author}</h4>
+      <p>{props.post.body}</p>
+      {/* event handlers can be attached with attributes (e.g. onEventNameInCamelCase) */}
+      <button onClick={() => setLike(!like)}>{like ? "★" : "☆"}</button>
+    </article>
+  );
+};
+
+export default Post;
+```
 
 #### useState with TypeScript
 
+Implementing `useState` with TypeScript only requires declaring a type on the hook itself.
+
+```tsx
+// src/Post.tsx
+import { useState } from "react";
+
+// make sure to add a type definition for your props
+interface Props {
+  post: { title: string; author: string; body: string };
+}
+
+const Post = (props: Props) => {
+  // useState can take a type argument
+  const [like, setLike] = useState<boolean>(false);
+
+  return (
+    <article className="post">
+      <h3>{props.post.title}</h3>
+      <h4>{props.post.author}</h4>
+      <p>{props.post.body}</p>
+      <button onClick={() => setLike(!like)}>{like ? "★" : "☆"}</button>
+    </article>
+  );
+};
+
+export default Post;
+```
+
 ### useEffect
 
-#### useEffect with TypeScript
+The `useEffect` hook is used to run side effects upon component mounting, state and props updates, and component unmounting.
+
+A `useEffect` typically looks like this:
+
+```js
+useEffect(() => {
+  console.log("do something");
+  setSomeOtherState(someState);
+}, [someState, someProps, someOtherProps]);
+```
+
+The first argument is the code that runs between updates, also known as the effect. The second (and optional) argument is the dependency array—if any of the variables within the array are updated, the effect runs. If no variables are present, but the array is present, the effect runs once only on mount. If there is no second argument, the effect runs upon each re-render.
+
+#### The Component Lifecycle
+
+The **component lifecycle** refers to the events that occur during a component's rendering, its state and props updates, and its eventual unrendering.
+
+When a component first renders to the screen successfully, it's referred to as **mounting**. After this initial render, the component will re-render depending on `state` and `props` updates, and finally **unmount** when the component is no longer rendered on the screen.
+
+```jsx
+// src/Post.jsx
+import { useEffect, useState } from "react";
+
+const Post = (props) => {
+  const [like, setLike] = useState(false);
+
+  useEffect(() => {
+    console.log("The like variable has changed!");
+  }, [like]);
+
+  useEffect(() => {
+    console.log("The component has mounted!");
+  }, []);
+
+  useEffect(() => {
+    console.log("The component has re-rendered!");
+  });
+
+  return (
+    <article className="post">
+      <h3>{props.post.title}</h3>
+      <h4>{props.post.author}</h4>
+      <p>{props.post.body}</p>
+      {/* event handlers can be attached with attributes (e.g. onEventNameInCamelCase) */}
+      <button onClick={() => setLike(!like)}>{like ? "★" : "☆"}</button>
+    </article>
+  );
+};
+
+export default Post;
+```
+
+#### Effects vs. Cleanup
+
+In addition to a side effect, a **cleanup** function can be used to run items between renders. To use it, return a function from within the `useEffect`:
+
+```jsx
+import { useEffect, useState } from "react";
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    console.log("Count has been updated!");
+    return () => {
+      console.log("Count is about to be updated!");
+    };
+  }, [count]);
+
+  return (
+    <div>
+      <span>This is the current count: {count}</span>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </div>
+  );
+};
+
+export default Counter;
+```
+
+To keep track of when effects and cleanups run with different dependency arrays, you can refer to this chart:
+
+|         Dependency Array          |             Effect              |          Cleanup           |
+| :-------------------------------: | :-----------------------------: | :------------------------: |
+|            Empty: (``)            |       Runs every render.        | Runs before every render.  |
+|        Empty array: (`[]`)        |    Runs on component mount.     | Runs on component unmount. |
+| Array: (`[someState, someProps]`) | Runs whenever variables update. |   Runs between updates.    |
 
 ### useReducer
 
