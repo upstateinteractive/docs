@@ -1,4 +1,4 @@
-<img src="../../files/sm-grad-logo.png" >
+<img src="https://github.com/upstateinteractive/docs/blob/master/files/sm-grad-logo.png" >
 
 # Contributing to UI Docs
 
