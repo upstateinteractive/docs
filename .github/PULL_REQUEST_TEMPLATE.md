@@ -1,4 +1,4 @@
-<img src="../files/sm-grad-logo.png" >
+<img src="https://github.com/upstateinteractive/docs/blob/master/files/sm-grad-logo.png" >
 
 # Upstate Interactive Docs
 
@@ -18,7 +18,7 @@
 
 > Please fill out before merging.
 
-- [ ] I have read [CONTRIBUTING.md](./CONTRIBUTING.md).
+- [ ] I have read [CONTRIBUTING.md](https://github.com/upstateinteractive/docs/blob/master/.github/CONTRIBUTING.md).
 
 ## Additional Comments
 
