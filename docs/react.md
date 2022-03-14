@@ -13,30 +13,30 @@ This guide is intended to introduce you to [React](https://github.com/facebook/r
   - [TypeScript](#typescript)
   - [React Beyond Create React App](#react-beyond-create-react-app)
 - [Your First Component](#your-first-component)
+  - [A Note on the Virtual DOM](#a-note-on-the-virtual-dom)
   - [Javascript in JSX](#javascript-in-jsx)
   - [Nested Components](#nested-components)
   - [Props](#props)
+    - [Other Reserved Words In Props And Attributes](#other-reserved-words-in-props-and-attributes)
   - [Leveraging Arrays](#leveraging-arrays)
 - [Hooks](#hooks)
   - [useState](#usestate)
     - [with TypeScript](#usestate-with-typescript)
   - [useEffect](#useeffect)
-  - [useReducer](#usereducer)
-    - [with TypeScript](#usereducer-with-typescript)
-  - [useContext](#usecontext)
-    - [with TypeScript](#usecontext-with-typescript)
+    - [The Component Lifecycle](#the-component-lifecycle)
+    - [Effects vs. Cleanup](#effects-vs-cleanup)
   - [useMemo](#usememo)
-    - [with TypeScript](#usememo-with-typescript)
-  - [useCallback](#usecallback)
-    - [with TypeScript](#usecallback-with-typescript)
-- [Routing](#routing)
-  - [Installation && Setup](#installation--setup)
-  - [React Router v6](#react-router-v6)
-- [Resources](#resources)
+  - [useContext](#usecontext)
+    - [with TypeScript](#usecontext-with-typescript) 
+- [Tooling Beyond React](#tooling-beyond-react)
+  - [State Management (Redux)](#state-management-redux)
+  - [Routing (React Router)](#routing-react-router)
+  - [Design Systems (Storybook)](#design-systems-storybook)
+- [Additional Resources](#additional-resources)
 
 ## Intro: What is React?
 
-React is a front-end framework that combines HTML, CSS, and JS into JSX. It uses a component-based structure to create dynamic and performant web applications. In addition, its syntax known as **JSX** allows for inline addition of JavaScript to HTML.
+React is a front-end framework that combines HTML, CSS, and JS into JSX. It uses a **component**-based structure to create dynamic and performant web applications. In addition, its syntax known as **JSX** allows for inline addition of JavaScript to HTML. It uses a **Virtual DOM** to simulate events and reduce re-rendering of elements.
 
 #### JSX
 
@@ -53,9 +53,8 @@ primaryButton.onclick = () => console.log("Primary!");
 
 Now the same code expressed with JSX:
 
-```html
-<button className="primary" id="primary-click" onClick={() =>
-console.log("Primary!")} />
+```jsx
+<button className="primary" id="primary-click" onClick={() => console.log("Primary!")} />
 ```
 
 JSX uses camelCase on all attributes, and curly braces for all non-string attribute values (numbers, booleans, functions).
@@ -178,7 +177,32 @@ Within the newly opened browser window (at `http://localhost:3000`), you should 
 
 > If you need to have adjacent tags without a container, you can use a `Fragment`, by adding empty opening and closing tags (`<> </>`) around the elements.
 
-#### Javascript in JSX
+### A Note on the Virtual DOM
+
+Now that we've created a component, how is it rendered to the `div#root`? In a React app created by `create-react-app` we can look within `src/index.js`, where the `ReactDOM.render` method takes a component / component tree to render, and creates an entry point within the element it is passed (known as the React root).
+
+```jsx
+// src/index.js
+
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById("root")
+);
+
+reportWebVitals();
+```
+
+In this case, the application is being rendered within the `div#root` present within the `public/index.html` file.
+
+### Javascript in JSX
 
 If you want to use JavaScript within your JSX, add a set of curly braces around your expression!
 
@@ -298,22 +322,21 @@ export default Post;
 
 Now one of our `Post` components is displaying text, and the other does not. Try passing the second `Post` some example `author`, `body`, and `title` props.
 
-### Other Reserved Words in Props and Attributes
+#### Other Reserved Words in Props and Attributes
 
 Similar to `key`, there are other reserved words that have either have specific functions as props or JSX attributes.
 
-#### ref
+##### ref
 
 `ref` is used by React to target for events within components, and is not passed down as a prop to the child component.
 
-#### style
+##### style
 
 In vanilla HTML, it's possible to pass a string of CSS style properties to an element to style it inline. In React, instead of passing a string, you can pass an object of CSS style properties in camelCase:
 
 ```jsx
 // src/Post.jsx
 const Post = (props) => {
-  a;
   const postStyles = {
     display: "flex",
     flexDirection: "column",
@@ -333,7 +356,7 @@ const Post = (props) => {
 export default Post;
 ```
 
-#### className
+##### className
 
 When working with JSX elements, the `class` keyword is reserved, so all instances should be replaced with `className`:
 
@@ -352,7 +375,7 @@ const Post = (props) => {
 export default Post;
 ```
 
-#### children
+##### children
 
 Components can be rendered as self-closing tags or open and closing tags. If rendered with opening and closing tags, the `children` prop can be used to render any elements or components within the two tags:
 
@@ -449,7 +472,7 @@ Let's go ahead and try implementing these hooks!
 
 ## Hooks
 
-This section introduces a series of hooks provided by React that provide essential storage and lifecycle functionality. When working in React, most information is redeclared upon each render—the general exception to this rule are imports and React hooks. Hooks should not be called conditionally, in the same order, and before any other functions declared in the component. Let's see how they can be used to make changes to persistent data.
+This section introduces a series of hooks provided by React that provide essential storage and lifecycle functionality. When working in React, most information is redeclared upon each render—the general exception to this rule are imports and React hooks. We can recognize a React hook because it will always start with `use` Hooks should not be called conditionally, in the same order, and before any other functions declared in the component. Let's see how they can be used to make changes to persistent data.
 
 ### useState
 
@@ -621,30 +644,256 @@ To keep track of when effects and cleanups run with different dependency arrays,
 |        Empty array: (`[]`)        |    Runs on component mount.     | Runs on component unmount. |
 | Array: (`[someState, someProps]`) | Runs whenever variables update. |   Runs between updates.    |
 
-### useReducer
+### useMemo
 
-#### useReducer with TypeScript
+The `useMemo` hook can be used to reduce recomputation of values declared within components.
+
+A `useMemo` will usually look like this:
+
+```js
+const memoizedValue = useMemo(
+  () => expensiveComputation(someArg, someOtherArg),
+  [someArg, someOtherArg]
+);
+```
+
+Similar to a useEffect, `useMemo` takes two arguments: the function/value to be computed and an array of values, that when changed, will cause the `useMemo` to recompute the values.
+
+Consider the following example, using our `Post` component from earlier:
+
+```jsx
+import Post from "./Post";
+
+const Forum = (props) => {
+  const [comment, setComment] = useState("");
+  // recomputes every render
+  const postsByAuthor = props.posts.sort((a, b) => a.author - b.author);
+
+  return (
+    <main>
+      <form>
+        <input
+          type="text"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+      </form>
+      <section>
+        <h3>Unmemoized Posts</h3>
+        {postsByAuthor.map((post) => (
+          <Post post={post} />
+        ))}
+      </section>
+    </main>
+  );
+};
+
+export default Forum;
+```
+
+The above example will re-render each time that `comment` is updated. Let's add `useMemo` to only recompute the sorted posts when they are updated:
+
+```jsx
+import { useMemo } from "react";
+import Post from "./Post";
+
+const Forum = (props) => {
+  const [comment, setComment] = useState("");
+  // recomputes only when posts change
+  const memoizedPostsByAuthor = useMemo(
+    props.posts.sort((a, b) => a.author - b.author),
+    [props.posts]
+  );
+
+  return (
+    <main>
+      <form>
+        <input
+          type="text"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+      </form>
+      <section>
+        <h3>Memoized Posts</h3>
+        {memoizedPostsByAuthor.map((post) => (
+          <Post post={post} />
+        ))}
+      </section>
+    </main>
+  );
+};
+
+export default Forum;
+```
 
 ### useContext
 
+The `useContext` hook can be used to pass information around an application without the use of props.
+
+Setting up a `useContext` requires a bit more setup, as there are two parts: the `context` and the `provider`. The `context` is a reference to the information, and the `provider` is a component wrapper which provides the information referenced. To access the context, use the `useContext` hook with the
+
+Setting up a `useContext` usually looks like this:
+
+```jsx
+// src/context/index.js
+import { createContext, useContext } from "react";
+
+export const AppContext = createContext({});
+// use the displayName property to update the context's name within the Components tab
+AppContext.displayName = "AppContext";
+export const useAppContext = () => useContext(AppContext);
+
+export const AppContextProvider = ({ children }) => {
+  const value = {};
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export default AppContextProvider;
+```
+
+Within the context's provider, you can also implement other React hooks, such as `useEffect` and `useState`:
+
+```jsx
+// src/context/index.js
+import { createContext, useContext, useEffect, useState } from "react";
+
+export const AppContext = createContext({});
+AppContext.displayName = "AppContext";
+export const useAppContext = () => useContext(AppContext);
+
+export const AppContextProvider = ({ children }) => {
+  const [records, setRecords] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/records")
+      .then((res) => res.json())
+      .then((data) => setRecords(data))
+      .catch((e) => console.error(e));
+  }, []);
+
+  const value = {
+    records,
+    setRecords,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export default AppContextProvider;
+```
+
+This context can then be added around any component (or around the `App` component) to allow access or updates to this information for child components:
+
+```jsx
+// src/index.js
+
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import { AppContextProvider } from "./context";
+import reportWebVitals from "./reportWebVitals";
+
+ReactDOM.render(
+  <React.StrictMode>
+    <AppContextProvider>
+      <App />
+    </AppContextProvider>
+  </React.StrictMode>,
+  document.getElementById("root")
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+```
+
+```jsx
+// src/App.js
+import { useAppContext } from "./context";
+
+function App() {
+  // properties can be destructured from the context
+  const { records } = useAppContext();
+
+  return (
+    <div className="App">
+      {records.map((record) => (
+        <p>{record.title}</p>
+      ))}
+    </div>
+  );
+}
+
+export default App;
+```
+
 #### useContext with TypeScript
 
-### useMemo
+Using `useContext` with Typescript requires adding a type both to the `context` and the `provider`:
 
-#### useMemo with TypeScript
+```tsx
+// src/context/index.tsx
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-### useCallback
+export type AppContextType = {
+  records: string[];
+  setRecords: (r: string[]) => void;
+};
+export const AppContext = createContext<AppContextType>({
+  records: [],
+  setRecords: () => {},
+});
+AppContext.displayName = "AppContext";
+export const useAppContext = () => useContext(AppContext);
 
-#### useCallback with TypeScript
+export const AppContextProvider = ({ children }: PropsWithChildren<{}>) => {
+  const [records, setRecords] = useState<string[]>([]);
 
-## State Management
+  useEffect(() => {
+    fetch("/api/records")
+      .then((res) => res.json())
+      .then((data) => setRecords(data))
+      .catch((e) => console.error(e));
+  }, []);
+
+  const value = {
+    records,
+    setRecords,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export default AppContextProvider;
+```
+
+## Tooling Beyond React
+
+At this point, you can create a new React application and navigate through an existing codebase, so what comes next? The following sections detail additional features / frameworks to add to an application.
+
+### State Management (Redux)
 
 Considering all the above types of creating and distributing state across an application, there are also many ways of managing said state outside of React. [Redux](https://redux.js.org/) and its companion [Redux Toolkit](https://redux-toolkit.js.org/) are the most commonly leveraged frameworks. You can read more on it in our document on it [here](./redux.md).
 
-## Routing
+### Routing (React Router)
 
-### Installation && Setup
+While React is generally viewed as a single page application framework, routing can be implemented by using [React Router](https://www.npmjs.com/package/react-router-dom). React Router DOM has a few very different implementations, most notably `>=5.1 <6.0` and `>=6.0`. For developers approaching for the first time, make sure to read the [v6 documentation](https://reactrouter.com/docs/en/v6/getting-started/tutorial) If your upcoming project has `react-router-dom@<6`, then make sure to refer to the [v5.1 documentation](https://v5.reactrouter.com/web/guides/quick-start).
 
-## Resources
+### Design Systems (Storybook)
 
-## React Design Patterns
+[Storybook](https://storybook.js.org/) is a design system used to create dynamic UI components testable with "stories". It's often used in tandem with React to be able to test different variations on components.
+
+## Additional Resources
+
+- [React on GitHub](https://github.com/facebook/react)
+- [React: Getting Started](https://reactjs.org/docs/getting-started.html)
