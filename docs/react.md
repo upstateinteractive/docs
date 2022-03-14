@@ -731,7 +731,7 @@ export default Forum;
 
 The `useContext` hook can be used to pass information around an application without the use of props.
 
-Setting up a `useContext` requires a bit more setup, as there are two parts: the `context` and the `provider`. The `context` is a reference to the information, and the `provider` is a component wrapper which provides the information referenced. To access the context, use the `useContext` hook with the
+Setting up a `useContext` requires a bit more setup, as there are two parts: the `context` and the `provider`. The `context` is a reference to the information, and the `provider` is a component wrapper which provides the information referenced. To access the context, use the `useContext` hook with the created `context`.
 
 Setting up a `useContext` usually looks like this:
 
