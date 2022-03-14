@@ -17,6 +17,7 @@ We use documented processes whenever possible. They make getting up to speed eas
 #### First There Were Documents...
 
 __Frontend:__
+* [React](docs/react.md) for dynamic front-ends
 * [Angular](docs/angular.md) for rich web UIs
 * [ngRx](docs/ngrx.md) for state management
 * [RxJs](docs/rxjs.md) for reactive programming
